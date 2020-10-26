@@ -4,8 +4,20 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import es.hefame.keyvault.config.Conf;
+
 public class MariaDbConnection
 {
+
+	private static Logger logger = LogManager.getLogger();
+	
+	private static final String DB_CONNECTION_URI = Conf.getString("dao.provider.MariaDb.uri");
+	private static final String DB_CONNECTION_USER = Conf.getString("dao.provider.MariaDb.user");
+	private static final String DB_CONNECTION_PASS = Conf.getString("dao.provider.MariaDb.pass");
+
 	private MariaDbConnection () {
 
 	}
@@ -24,7 +36,9 @@ public class MariaDbConnection
 			{
 				e.printStackTrace();
 			}
-			connection = DriverManager.getConnection("jdbc:mariadb://db.hefame.es:3306/db", "user", "123123");
+
+			logger.info("Conectando a MariaDB {} con el usuario {}", DB_CONNECTION_URI, DB_CONNECTION_USER);
+			connection = DriverManager.getConnection(DB_CONNECTION_URI, DB_CONNECTION_USER, DB_CONNECTION_PASS);
 			connection.setAutoCommit(false);
 		}
 		return connection;

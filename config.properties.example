@@ -1,0 +1,24 @@
+# Configuración general del servicio HTTP
+http.port=8080
+http.maxConnections=10
+
+
+# Configuración del origen de datos (DAO)
+##########################################
+
+# Proveedor de la base de datos.
+# Actualmente se admite:
+# - MariaDb: La base de datos es una instancia MariaDb
+# - Testing: La base de datos está en memoria y se reinicia con datos de prueba.
+dao.provider=MariaDb
+
+# Configuración del proveedor MariaDb
+dao.provider.MariaDb.uri=jdbc:mariadb://dbhost.example.com:3306/dbName
+dao.provider.MariaDb.user=userName
+dao.provider.MariaDb.pass=userPass
+
+# Configuración del proveedor MongoDb (Aun no implementado)
+#dao.provider.MongoDb.uri=
+#dao.provider.MongoDb.user=
+#dao.provider.MongoDb.pass=
+#dao.provider.MongoDb.database=

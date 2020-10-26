@@ -3,12 +3,14 @@ package es.hefame.keyvault.run;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import es.hefame.hcore.http.HttpController;
 import es.hefame.hcore.http.authentication.rfc7235.rfc7617.BasicAuthenticator;
 import es.hefame.hcore.http.server.HttpService;
+import es.hefame.keyvault.config.Conf;
 import es.hefame.keyvault.controller.rest.AuthCheckRestHandler;
 import es.hefame.keyvault.controller.rest.DomainRestHandler;
 import es.hefame.keyvault.controller.rest.KeypairRestHandler;
@@ -25,15 +27,12 @@ public class KeyvaultServer
 	public static void main(String[] args) throws Exception
 	{
 
-		logger.info("Arrancando servicio KeyVault");
-		DAO.set_provider("MariaDb");
+		DAO.set_provider(Conf.get("dao.provider", "Testing"));
 
 		try
 		{
-			// C.load();
-
-			int port = 8443;// C.agent.port;
-			int maxConnections = 10;
+			int port = Conf.get("http.port", 8080);
+			int maxConnections = Conf.get("http.maxConnections", 10);
 
 			Map<String, HttpController> routes = new HashMap<>();
 			// routes.put("/test", new jhefame.hfe.controller.QuickTestHandler());
@@ -47,14 +46,15 @@ public class KeyvaultServer
 			HttpController.setDefaultAuthenticator(new BasicAuthenticator("HefameKeyVault", new DomainPasswordMatcher()));
 
 			ShutdownHook shutdownHook = new ShutdownHook(server);
-			// L.trace("Setting up ShutdownHook [{}]", shutdown_hook.getClass().getName());
 			Runtime.getRuntime().addShutdownHook(shutdownHook);
 
+			logger.info("Arrancando servidor HTTP en el puerto {}", port);
 			server.start();
 		}
 		catch (Exception e)
 		{
-			logger.fatal("Aborting execution with exit code {}", 2);
+			logger.fatal("Abortando la ejecución del servidor debido a una excepción");
+			logger.catching(Level.FATAL, e);
 			System.exit(2);
 		}
 
