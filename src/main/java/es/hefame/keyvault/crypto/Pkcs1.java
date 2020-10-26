@@ -26,12 +26,12 @@ public class Pkcs1 {
 		Security.addProvider(new BouncyCastleProvider());
 	}
 
-	public static byte[] sign(byte[] data, Key pk, HashAlgorithm hash_algorithm) throws HttpException {
+	public static byte[] sign(byte[] data, Key pk, HashAlgorithm hashAlgorithm) throws HttpException {
 
-		SignatureAlgorithm sign_algorithm = SignatureAlgorithm.build(hash_algorithm,
+		SignatureAlgorithm signAlgorithm = SignatureAlgorithm.build(hashAlgorithm,
 				KeyAlgorithm.build(pk.getAlgorithm()));
 		try {
-			Signature signMachine = Signature.getInstance(sign_algorithm.name(), "BC");
+			Signature signMachine = Signature.getInstance(signAlgorithm.name(), "BC");
 			signMachine.initSign((PrivateKey) pk, new SecureRandom());
 			signMachine.update(data);
 			return signMachine.sign();

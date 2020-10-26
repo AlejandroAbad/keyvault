@@ -60,7 +60,7 @@ public class DomainChangeMessageParser {
 		}
 	}
 
-	public Domain get_domain() {
+	public Domain getDomain() {
 		return this.domain;
 	}
 }

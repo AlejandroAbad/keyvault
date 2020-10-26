@@ -15,7 +15,7 @@ public class MariaDbDomainDAO implements DomainDAO
 {
 
 	@Override
-	public Domain get_by_id(String id) throws HException
+	public Domain getById(String id) throws HException
 	{
 		Connection conn = null;
 		PreparedStatement st = null;
@@ -49,7 +49,7 @@ public class MariaDbDomainDAO implements DomainDAO
 	}
 
 	@Override
-	public List<Domain> get_list() throws HException
+	public List<Domain> getList() throws HException
 	{
 		List<Domain> domain_list = new LinkedList<Domain>();
 		Connection conn = null;

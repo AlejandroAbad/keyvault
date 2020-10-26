@@ -27,7 +27,7 @@ public class KeypairUpdateMessageParser {
 				throw new HttpException(400, "'id' field is mandatory");
 			}
 
-			this.original_keypair = DAO.keypair().get_by_id(id);
+			this.original_keypair = DAO.keypair().getById(id);
 
 			if (original_keypair == null) {
 				throw new HttpException(404, "Key pair not found");

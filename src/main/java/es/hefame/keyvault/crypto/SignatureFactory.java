@@ -14,29 +14,29 @@ public class SignatureFactory {
 
 	}
 
-	public static byte[] sign_pkcs7(byte[] payload, Keypair keypair, HashAlgorithm hash_algorithm,
-			boolean attach_payload, boolean with_chain) throws HttpException {
+	public static byte[] signPKCS7(byte[] payload, Keypair keypair, HashAlgorithm hashAlgorithm,
+			boolean attachPayload, boolean withChain) throws HttpException {
 		List<X509Certificate> certs = null;
-		if (with_chain) {
+		if (withChain) {
 			certs = keypair.getCertificateChain();
 		}
-		return Pkcs7.sign(payload, keypair.getCertificate(), keypair.getPrivateKey(), hash_algorithm, certs,
-				attach_payload);
+		return Pkcs7.sign(payload, keypair.getCertificate(), keypair.getPrivateKey(), hashAlgorithm, certs,
+				attachPayload);
 	}
 
-	public static byte[] sign_pkcs1(byte[] payload, Keypair keypair, HashAlgorithm hash_algorithm)
+	public static byte[] signPKCS1(byte[] payload, Keypair keypair, HashAlgorithm hashAlgorithm)
 			throws HttpException {
-		return Pkcs1.sign(payload, keypair.getPrivateKey(), hash_algorithm);
+		return Pkcs1.sign(payload, keypair.getPrivateKey(), hashAlgorithm);
 	}
 
-	public static byte[] sign_pades(byte[] payload, Keypair keypair, HashAlgorithm hash_algorithm,
-			SignatureFormat signature_format) throws HttpException {
-		return PAdES.sign(payload, keypair, hash_algorithm, signature_format);
+	public static byte[] signPAdES(byte[] payload, Keypair keypair, HashAlgorithm hashAlgorithm,
+			SignatureFormat signatureFormat) throws HttpException {
+		return PAdES.sign(payload, keypair, hashAlgorithm, signatureFormat);
 	}
 
-	public static byte[] sign_xmldsig(byte[] payload, Keypair keypair, String node, HashAlgorithm hash_algorithm,
-			SignatureFormat signature_format) throws HttpException {
-		return XmlDSig.sign(payload, keypair, node, hash_algorithm, signature_format);
+	public static byte[] signXmlDSig(byte[] payload, Keypair keypair, String node, HashAlgorithm hashAlgorithm,
+			SignatureFormat signatureFormat) throws HttpException {
+		return XmlDSig.sign(payload, keypair, node, hashAlgorithm, signatureFormat);
 	}
 
 }

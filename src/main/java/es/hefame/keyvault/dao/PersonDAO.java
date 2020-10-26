@@ -10,13 +10,13 @@ import es.hefame.keyvault.datastructure.model.domain.Domain;
 
 public interface PersonDAO
 {
-	public Person get_by_fqdn(String fqdn) throws HException;
+	public Person getByFQDN(String fqdn) throws HException;
 
-	public List<Person> get_by_domain(Domain d) throws HException;
+	public List<Person> getByDomain(Domain d) throws HException;
 
-	public List<Person> get_by_domain_id(String d) throws HException;
+	public List<Person> getByDomainId(String d) throws HException;
 
-	public List<Person> get_list() throws HException;
+	public List<Person> getList() throws HException;
 
 	public boolean insert(Person person) throws HException;
 
@@ -24,5 +24,5 @@ public interface PersonDAO
 
 	public boolean delete(Person person) throws HException;
 
-	public boolean delete(String person_id) throws HException;
+	public boolean delete(String personId) throws HException;
 }

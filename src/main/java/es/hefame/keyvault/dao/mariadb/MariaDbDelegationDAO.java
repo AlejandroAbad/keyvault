@@ -23,7 +23,6 @@ public class MariaDbDelegationDAO implements DelegationDAO
 
 	@Override
 	public List<Delegation> getPersonDelegations(String personId) throws HException {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -41,7 +40,7 @@ public class MariaDbDelegationDAO implements DelegationDAO
 			st.setString(1, keypairId);
 			rs = st.executeQuery();
 
-			List<Delegation> delegations = new LinkedList<Delegation>();
+			List<Delegation> delegations = new LinkedList<>();
 			
 			while (rs.next())
 			{

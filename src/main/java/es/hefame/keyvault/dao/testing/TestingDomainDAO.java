@@ -34,7 +34,7 @@ public class TestingDomainDAO implements DomainDAO
 	}
 
 	@Override
-	public Domain get_by_id(String id)
+	public Domain getById(String id)
 	{
 		for (Domain d : domain_list)
 		{
@@ -44,7 +44,7 @@ public class TestingDomainDAO implements DomainDAO
 	}
 
 	@Override
-	public List<Domain> get_list()
+	public List<Domain> getList()
 	{
 		return domain_list;
 	}
@@ -54,7 +54,7 @@ public class TestingDomainDAO implements DomainDAO
 	{
 		if (domain == null) throw new HException("Cannot insert a null domain");
 
-		if (this.get_by_id(domain.getIdentifier()) == null)
+		if (this.getById(domain.getIdentifier()) == null)
 		{
 			return domain_list.add(domain);
 		}
@@ -85,7 +85,7 @@ public class TestingDomainDAO implements DomainDAO
 	{
 		// This simulates a DELETE in cascade for example in a SQL db
 		PersonDAO person_datasource = DAO.person();
-		List<Person> people_in_domain = person_datasource.get_by_domain(domain);
+		List<Person> people_in_domain = person_datasource.getByDomain(domain);
 		for (Person p : people_in_domain)
 		{
 			person_datasource.delete(p);
@@ -97,7 +97,7 @@ public class TestingDomainDAO implements DomainDAO
 	@Override
 	public boolean delete(String domain_id) throws HException
 	{
-		Domain d = this.get_by_id(domain_id);
+		Domain d = this.getById(domain_id);
 		return this.delete(d);
 	}
 

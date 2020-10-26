@@ -31,9 +31,9 @@ public class KeypairRestHandler extends HttpController {
 	@Override
 	protected void get(HttpConnection t) throws IOException, HException {
 
-		String keypair_id = t.request.getURIField(2);
+		String keypairId = t.request.getURIField(2);
 
-		if (keypair_id == null) {
+		if (keypairId == null) {
 			String authenticatedUserID = t.request.getInternalValue(Domain.USER_ID, String.class);
 			if (authenticatedUserID == null) {
 				t.response.send(new HttpException(403, "Lista de certificados no disponible"));
@@ -42,13 +42,13 @@ public class KeypairRestHandler extends HttpController {
 
 			// Esto debe listar las claves del usuario autenticado
 			KeypairDAO keypairDAO = DAO.keypair();
-			List<Keypair> keys = keypairDAO.get_owned_by_person_id(authenticatedUserID);
+			List<Keypair> keys = keypairDAO.getOwnedByPersonId(authenticatedUserID);
 			KeypairListMessage message = new KeypairListMessage(keys);
 			t.response.send(message, 200);
 		} else {
 			KeypairDAO keypairDAO = DAO.keypair();
 
-			Keypair keypair = keypairDAO.get_by_id(keypair_id);
+			Keypair keypair = keypairDAO.getById(keypairId);
 			if (keypair != null) {
 				// AuthzManager.check(AuthzManager.in_local_domain(authenticated_user_id) ||
 				// AuthzManager.is_person(authenticated_user_id, keypair.get_owner_id()));
@@ -66,23 +66,21 @@ public class KeypairRestHandler extends HttpController {
 
 				// No especifica formato, se devuelve en JSON
 				t.response.send(keypair, 200);
-				return;
 
 			} else {
 				t.response.send(new HttpException(404, "No se encuentra el keypair solicitado"));
-				return;
 			}
 		}
 	}
 
 	@Override
 	protected void post(HttpConnection t) throws IOException, HException {
-		byte[] request_body = t.request.getBodyAsByteArray();
-		KeypairInsertMessageParser incoming_message = new KeypairInsertMessageParser(request_body);
-		Keypair new_keypair = incoming_message.get_keypair();
-		KeypairDAO keypair_datasource = DAO.keypair();
-		System.out.println(keypair_datasource.insert(new_keypair));
-		t.response.send(new_keypair, 200);
+		byte[] requestBody = t.request.getBodyAsByteArray();
+		KeypairInsertMessageParser incomingMessage = new KeypairInsertMessageParser(requestBody);
+		Keypair newKeypair = incomingMessage.getKeypair();
+		KeypairDAO keypairDAO = DAO.keypair();
+		System.out.println(keypairDAO.insert(newKeypair));
+		t.response.send(newKeypair, 200);
 	}
 
 	@Override
@@ -91,11 +89,11 @@ public class KeypairRestHandler extends HttpController {
 		// AuthzManager.check(AuthzManager.in_local_domain(authenticated_user_id) ||
 		// AuthzManager.is_person(authenticated_user_id, keypair.get_owner_id()));
 
-		byte[] request_body = t.request.getBodyAsByteArray();
-		KeypairUpdateMessageParser incoming_message = new KeypairUpdateMessageParser(request_body);
-		Keypair modified_keypair = incoming_message.get_updated_keypair();
+		byte[] requestBody = t.request.getBodyAsByteArray();
+		KeypairUpdateMessageParser incomingMessage = new KeypairUpdateMessageParser(requestBody);
+		Keypair modifiedKeypair = incomingMessage.get_updated_keypair();
 
-		Keypair original = DAO.keypair().get_by_id(modified_keypair.getIdentifier());
+		Keypair original = DAO.keypair().getById(modifiedKeypair.getIdentifier());
 
 		if (original == null) {
 			t.response.send(new HttpException(404, "No se encuentra el keypair especificado"));
@@ -105,24 +103,24 @@ public class KeypairRestHandler extends HttpController {
 		// AuthzManager.check(AuthzManager.in_local_domain(authenticated_user_id) ||
 		// AuthzManager.is_person(authenticated_user_id, original.get_owner_id()));
 
-		KeypairDAO keypair_datasource = DAO.keypair();
-		System.out.println(keypair_datasource.update(modified_keypair));
-		t.response.send(modified_keypair, 200);
+		KeypairDAO keypairDAO = DAO.keypair();
+		System.out.println(keypairDAO.update(modifiedKeypair));
+		t.response.send(modifiedKeypair, 200);
 	}
 
 	@Override
 	protected void delete(HttpConnection t) throws HException, IOException {
 		// String authenticated_user_id = (String) t.request.get_attribute("user_id");
 
-		String keypair_id = t.request.getURIField(2);
+		String keypairId = t.request.getURIField(2);
 
-		if (keypair_id == null) {
+		if (keypairId == null) {
 			t.response.send(new HttpException(400, "No se ha especificado un keypair"));
 			return;
 		}
 
-		Keypair keypair_to_delete = DAO.keypair().get_by_id(keypair_id);
-		if (keypair_to_delete == null) {
+		Keypair keypairToDelete = DAO.keypair().getById(keypairId);
+		if (keypairToDelete == null) {
 			t.response.send(new HttpException(404, "No se encuentra el keypair especificado"));
 			return;
 		}
@@ -131,8 +129,8 @@ public class KeypairRestHandler extends HttpController {
 		// AuthzManager.is_person(authenticated_user_id,
 		// keypair_to_delete.get_owner_id()));
 
-		DAO.keypair().delete(keypair_to_delete);
-		t.response.send(keypair_to_delete, 200);
+		DAO.keypair().delete(keypairToDelete);
+		t.response.send(keypairToDelete, 200);
 	}
 
 }

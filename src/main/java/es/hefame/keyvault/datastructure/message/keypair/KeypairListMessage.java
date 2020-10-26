@@ -11,11 +11,11 @@ import es.hefame.keyvault.datastructure.model.Keypair;
 public class KeypairListMessage implements JsonEncodable
 {
 
-	public List<Keypair> keypair_list = new LinkedList<Keypair>();
+	private List<Keypair> keypairList = new LinkedList<>();
 
 	public KeypairListMessage(List<Keypair> keypair_list)
 	{
-		this.keypair_list = keypair_list;
+		this.keypairList = keypair_list;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -23,7 +23,7 @@ public class KeypairListMessage implements JsonEncodable
 	public JSONArray jsonEncode()
 	{
 		JSONArray root = new JSONArray();
-		for (Keypair p : keypair_list)
+		for (Keypair p : keypairList)
 		{
 
 			// JSONObject domain_object = new JSONObject();
@@ -33,6 +33,10 @@ public class KeypairListMessage implements JsonEncodable
 			root.add(p.jsonEncode());
 		}
 		return root;
+	}
+
+	public List<Keypair> getKeypairList() {
+		return this.keypairList;
 	}
 
 }

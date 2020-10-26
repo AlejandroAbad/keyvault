@@ -36,7 +36,7 @@ public class MariaDbKeypairDAO implements KeypairDAO {
 	private static Logger logger = LogManager.getLogger();
 
 	@Override
-	public Keypair get_by_id(String pair_id) throws HException {
+	public Keypair getById(String pair_id) throws HException {
 		Connection conn = null;
 		PreparedStatement st = null;
 		ResultSet rs = null;
@@ -97,7 +97,7 @@ public class MariaDbKeypairDAO implements KeypairDAO {
 	}
 
 	@Override
-	public List<Keypair> get_list() throws HException {
+	public List<Keypair> getList() throws HException {
 		Connection conn = null;
 		PreparedStatement st = null, st2 = null;
 		ResultSet rs = null, rs2 = null;
@@ -160,12 +160,12 @@ public class MariaDbKeypairDAO implements KeypairDAO {
 	}
 
 	@Override
-	public List<Keypair> get_owned_by(Person owner) throws HException {
-		return this.get_owned_by_person_id(owner.get_identifier());
+	public List<Keypair> getOwnedBy(Person owner) throws HException {
+		return this.getOwnedByPersonId(owner.getIdentifier());
 	}
 
 	@Override
-	public List<Keypair> get_owned_by_person_id(String owner_id) throws HException {
+	public List<Keypair> getOwnedByPersonId(String owner_id) throws HException {
 		Connection conn = null;
 		PreparedStatement st = null, st2 = null;
 		ResultSet rs = null, rs2 = null;
@@ -189,20 +189,20 @@ public class MariaDbKeypairDAO implements KeypairDAO {
 				String id = rs.getString("id");
 				owner_name = rs.getString("owner_name");
 				owner_domain_id = rs.getString("owner_domain_id");
-				Blob certificate_bytes = rs.getBlob("certificate");
-				Blob privatekey_bytes = rs.getBlob("privatekey");
-				CertificateType certificate_type = CertificateType.build(rs.getString("certificate_type"));
-				KeyAlgorithm privatekey_algorithm = KeyAlgorithm.build(rs.getString("privatekey_algorithm"));
+				Blob certificateBytes = rs.getBlob("certificate");
+				Blob privatekeyBytes = rs.getBlob("privatekey");
+				CertificateType certificateType = CertificateType.build(rs.getString("certificate_type"));
+				KeyAlgorithm privatekeyAlgorithm = KeyAlgorithm.build(rs.getString("privatekey_algorithm"));
 
 				// Building the Certificate
-				CertificateFactory cert_fact = CertificateFactory.getInstance(certificate_type.certificateFactoryName);
-				X509Certificate certificate = (X509Certificate) cert_fact
-						.generateCertificate(certificate_bytes.getBinaryStream());
+				CertificateFactory certFactory = CertificateFactory.getInstance(certificateType.certificateFactoryName);
+				X509Certificate certificate = (X509Certificate) certFactory
+						.generateCertificate(certificateBytes.getBinaryStream());
 
 				// Building the PrivateKey
-				KeyFactory kf = KeyFactory.getInstance(privatekey_algorithm.name());
+				KeyFactory kf = KeyFactory.getInstance(privatekeyAlgorithm.name());
 				PKCS8EncodedKeySpec keysp = new PKCS8EncodedKeySpec(
-						privatekey_bytes.getBytes(1, (int) privatekey_bytes.length()));
+						privatekeyBytes.getBytes(1, (int) privatekeyBytes.length()));
 				PrivateKey privatekey = kf.generatePrivate(keysp);
 
 				// Building the Certificate Chain
@@ -212,16 +212,16 @@ public class MariaDbKeypairDAO implements KeypairDAO {
 				rs2 = st.executeQuery();
 				MariaDbConnection.clearResources(st);
 
-				List<X509Certificate> cert_chain = new LinkedList<X509Certificate>();
+				List<X509Certificate> certChain = new LinkedList<>();
 				while (rs2.next()) {
-					Blob chain_cert = rs2.getBlob("certificate");
-					certificate_type = CertificateType.build(rs2.getString("certificate_type"));
-					cert_fact = CertificateFactory.getInstance(certificate_type.certificateFactoryName);
-					cert_chain.add((X509Certificate) cert_fact.generateCertificate(chain_cert.getBinaryStream()));
+					Blob certInTheChain = rs2.getBlob("certificate");
+					certificateType = CertificateType.build(rs2.getString("certificate_type"));
+					certFactory = CertificateFactory.getInstance(certificateType.certificateFactoryName);
+					certChain.add((X509Certificate) certFactory.generateCertificate(certInTheChain.getBinaryStream()));
 				}
 				MariaDbConnection.clearResources(rs2);
 				certs.add(new Keypair(id, Domain.generateFQDN(owner_name, owner_domain_id), certificate, privatekey,
-						cert_chain));
+						certChain));
 
 			}
 		} catch (SQLException | CertificateException | NoSuchAlgorithmException | InvalidKeySpecException e) {
@@ -235,14 +235,14 @@ public class MariaDbKeypairDAO implements KeypairDAO {
 	}
 
 	@Override
-	public boolean insert(Keypair new_keypair) throws HException {
+	public boolean insert(Keypair newKeypair) throws HException {
 		Connection conn = null;
 		PreparedStatement st = null;
 		try {
 			// Creamos el usuario dueño de la clave si no existe de antes
-			Person p = DAO.person().get_by_fqdn(new_keypair.getOwnerId());
+			Person p = DAO.person().getByFQDN(newKeypair.getOwnerId());
 			if (p == null) {
-				p = new Person(new_keypair.getOwnerId());
+				p = new Person(newKeypair.getOwnerId());
 				logger.trace("Persona creada como requisito para insertar la clave: {}", p.jsonEncode());
 				DAO.person().insert(p);
 			}
@@ -252,13 +252,13 @@ public class MariaDbKeypairDAO implements KeypairDAO {
 			String selectSQL = "INSERT INTO keypair (id, owner_name, owner_domain_id, certificate, privatekey, certificate_type, privatekey_algorithm) VALUES (?, ?, ?, ?, ?, ?, ?)";
 			st = conn.prepareStatement(selectSQL);
 
-			st.setString(1, new_keypair.getIdentifier());
-			st.setString(2, Domain.getPersonNameFromFQDN(new_keypair.getOwnerId()));
-			st.setString(3, Domain.getDomainIdFromFQDN(new_keypair.getOwnerId()));
-			st.setBlob(4, new SerialBlob(new_keypair.getCertificate().getEncoded()));
-			st.setBlob(5, new SerialBlob(new_keypair.getPrivateKey().getEncoded()));
-			st.setString(6, new_keypair.getCertificate().getType());
-			st.setString(7, new_keypair.getPrivateKey().getAlgorithm());
+			st.setString(1, newKeypair.getIdentifier());
+			st.setString(2, Domain.getPersonNameFromFQDN(newKeypair.getOwnerId()));
+			st.setString(3, Domain.getDomainIdFromFQDN(newKeypair.getOwnerId()));
+			st.setBlob(4, new SerialBlob(newKeypair.getCertificate().getEncoded()));
+			st.setBlob(5, new SerialBlob(newKeypair.getPrivateKey().getEncoded()));
+			st.setString(6, newKeypair.getCertificate().getType());
+			st.setString(7, newKeypair.getPrivateKey().getAlgorithm());
 			int result = st.executeUpdate();
 
 			MariaDbConnection.clearResources(st);
@@ -268,10 +268,10 @@ public class MariaDbKeypairDAO implements KeypairDAO {
 				return false;
 			}
 
-			for (X509Certificate cert_in_chain : new_keypair.getCertificateChain()) {
+			for (X509Certificate cert_in_chain : newKeypair.getCertificateChain()) {
 				selectSQL = "INSERT INTO keypair_cert_chain (keypair_id, chain_number, certificate, certificate_type) VALUES (?, ?, ?, ?)";
 				st = conn.prepareStatement(selectSQL);
-				st.setString(1, new_keypair.getIdentifier());
+				st.setString(1, newKeypair.getIdentifier());
 				st.setInt(2, i++);
 				st.setBlob(3, new SerialBlob(cert_in_chain.getEncoded()));
 				st.setString(4, cert_in_chain.getType());
@@ -295,14 +295,14 @@ public class MariaDbKeypairDAO implements KeypairDAO {
 	}
 
 	@Override
-	public boolean update(Keypair modified_keypair) throws HException {
+	public boolean update(Keypair modifiedKeypair) throws HException {
 		Connection conn = null;
 		PreparedStatement st = null;
 		try {
-			// Creamos el usuario due�o de la clave si no existe de antes
-			Person p = DAO.person().get_by_fqdn(modified_keypair.getOwnerId());
+			// Creamos el usuario dueño de la clave si no existe de antes
+			Person p = DAO.person().getByFQDN(modifiedKeypair.getOwnerId());
 			if (p == null) {
-				p = new Person(modified_keypair.getOwnerId());
+				p = new Person(modifiedKeypair.getOwnerId());
 				logger.trace("Persona creada como requisito para actualizar la clave: {}", p.jsonEncode());
 				DAO.person().insert(p);
 			}
@@ -310,13 +310,13 @@ public class MariaDbKeypairDAO implements KeypairDAO {
 			conn = MariaDbConnection.getConnection();
 			String selectSQL = "UPDATE keypair SET owner_name = ?, owner_domain_id = ?, certificate = ?, privatekey = ?, certificate_type = ?, privatekey_algorithm = ? WHERE id = ?";
 			st = conn.prepareStatement(selectSQL);
-			st.setString(1, Domain.getPersonNameFromFQDN(modified_keypair.getOwnerId()));
-			st.setString(2, Domain.getDomainIdFromFQDN(modified_keypair.getOwnerId()));
-			st.setBlob(3, new SerialBlob(modified_keypair.getCertificate().getEncoded()));
-			st.setBlob(4, new SerialBlob(modified_keypair.getPrivateKey().getEncoded()));
-			st.setString(5, modified_keypair.getCertificate().getType());
-			st.setString(6, modified_keypair.getPrivateKey().getAlgorithm());
-			st.setString(7, modified_keypair.getIdentifier());
+			st.setString(1, Domain.getPersonNameFromFQDN(modifiedKeypair.getOwnerId()));
+			st.setString(2, Domain.getDomainIdFromFQDN(modifiedKeypair.getOwnerId()));
+			st.setBlob(3, new SerialBlob(modifiedKeypair.getCertificate().getEncoded()));
+			st.setBlob(4, new SerialBlob(modifiedKeypair.getPrivateKey().getEncoded()));
+			st.setString(5, modifiedKeypair.getCertificate().getType());
+			st.setString(6, modifiedKeypair.getPrivateKey().getAlgorithm());
+			st.setString(7, modifiedKeypair.getIdentifier());
 
 			int result = st.executeUpdate();
 			MariaDbConnection.clearResources(st);
@@ -328,14 +328,14 @@ public class MariaDbKeypairDAO implements KeypairDAO {
 
 			selectSQL = "DELETE FROM keypair_cert_chain WHERE keypair_id = ?";
 			st = conn.prepareStatement(selectSQL);
-			st.setString(1, modified_keypair.getIdentifier());
+			st.setString(1, modifiedKeypair.getIdentifier());
 			st.executeUpdate();
 			MariaDbConnection.clearResources(st);
 
-			for (X509Certificate cert_in_chain : modified_keypair.getCertificateChain()) {
+			for (X509Certificate cert_in_chain : modifiedKeypair.getCertificateChain()) {
 				selectSQL = "INSERT INTO keypair_cert_chain (keypair_id, chain_number, certificate, certificate_type) VALUES (?, ?, ?, ?)";
 				st = conn.prepareStatement(selectSQL);
-				st.setString(1, modified_keypair.getIdentifier());
+				st.setString(1, modifiedKeypair.getIdentifier());
 				st.setInt(2, i++);
 				st.setBlob(3, new SerialBlob(cert_in_chain.getEncoded()));
 				st.setString(4, cert_in_chain.getType());
@@ -359,7 +359,7 @@ public class MariaDbKeypairDAO implements KeypairDAO {
 	}
 
 	@Override
-	public boolean delete(String keypair_id) throws HException {
+	public boolean delete(String keypairId) throws HException {
 		Connection conn = null;
 		PreparedStatement st = null;
 		try {
@@ -367,7 +367,7 @@ public class MariaDbKeypairDAO implements KeypairDAO {
 
 			String selectSQL = "DELETE FROM keypair WHERE id = ?";
 			st = conn.prepareStatement(selectSQL);
-			st.setString(1, keypair_id);
+			st.setString(1, keypairId);
 			int result = st.executeUpdate();
 
 			if (result == 1) {

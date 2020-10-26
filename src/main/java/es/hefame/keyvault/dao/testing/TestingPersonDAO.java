@@ -26,23 +26,23 @@ public class TestingPersonDAO implements PersonDAO
 	}
 
 	@Override
-	public Person get_by_fqdn(String fqdn) throws HException
+	public Person getByFQDN(String fqdn) throws HException
 	{
 		for (Person s : people)
 		{
-			if (s.get_identifier().equals(fqdn)) { return s; }
+			if (s.getIdentifier().equals(fqdn)) { return s; }
 		}
 		return null;
 	}
 
 	@Override
-	public List<Person> get_by_domain(Domain d)
+	public List<Person> getByDomain(Domain d)
 	{
-		if (d != null) { return this.get_by_domain_id(d.getIdentifier()); }
+		if (d != null) { return this.getByDomainId(d.getIdentifier()); }
 		return new LinkedList<Person>();
 	}
 
-	public List<Person> get_by_domain_id(String domain_id)
+	public List<Person> getByDomainId(String domain_id)
 	{
 		List<Person> result = new LinkedList<Person>();
 
@@ -50,7 +50,7 @@ public class TestingPersonDAO implements PersonDAO
 		{
 			for (Person s : people)
 			{
-				if (s.get_domain_id().equals(domain_id))
+				if (s.getDomainId().equals(domain_id))
 				{
 					result.add(s);
 				}
@@ -60,7 +60,7 @@ public class TestingPersonDAO implements PersonDAO
 	}
 
 	@Override
-	public List<Person> get_list()
+	public List<Person> getList()
 	{
 		return people;
 	}
@@ -70,13 +70,13 @@ public class TestingPersonDAO implements PersonDAO
 	{
 		if (person == null) throw new HException("Cannot insert a null person");
 
-		if (this.get_by_fqdn(person.get_identifier()) == null)
+		if (this.getByFQDN(person.getIdentifier()) == null)
 		{
 			return people.add(person);
 		}
 		else
 		{
-			throw new HException("Someone with FQDN [ " + person.get_identifier() + " ] already exists in database");
+			throw new HException("Someone with FQDN [ " + person.getIdentifier() + " ] already exists in database");
 		}
 	}
 
@@ -92,7 +92,7 @@ public class TestingPersonDAO implements PersonDAO
 		}
 		else
 		{
-			throw new HException("Person with ID [ " + person.get_identifier() + " ] does not exists. No update viable");
+			throw new HException("Person with ID [ " + person.getIdentifier() + " ] does not exists. No update viable");
 		}
 
 	}
@@ -103,7 +103,7 @@ public class TestingPersonDAO implements PersonDAO
 		KeypairDAO keypair_datasource;
 		keypair_datasource = DAO.keypair();
 
-		List<Keypair> owned_keypair = keypair_datasource.get_owned_by(person);
+		List<Keypair> owned_keypair = keypair_datasource.getOwnedBy(person);
 		for (Keypair p : owned_keypair)
 		{
 			keypair_datasource.delete(p);
@@ -114,7 +114,7 @@ public class TestingPersonDAO implements PersonDAO
 
 	public boolean delete(String person_id) throws HException
 	{
-		Person p = this.get_by_fqdn(person_id);
+		Person p = this.getByFQDN(person_id);
 		return this.delete(p);
 	}
 

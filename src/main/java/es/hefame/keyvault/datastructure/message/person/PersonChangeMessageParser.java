@@ -18,22 +18,22 @@ public class PersonChangeMessageParser {
 			JSONObject jsonObject = (JSONObject) obj;
 
 			String name = (String) jsonObject.get("name");
-			String domain_id = (String) jsonObject.get("domain");
+			String domainId = (String) jsonObject.get("domain");
 
 			if (name == null) {
 				throw new HttpException(400, "'name' field is mandatory");
 			}
-			if (domain_id == null) {
+			if (domainId == null) {
 				throw new HttpException(400, "'domain' field is mandatory");
 			}
 
-			this.person = new Person(name, domain_id);
+			this.person = new Person(name, domainId);
 		} catch (ParseException e) {
 			throw new HttpException(400, "JSON is bad formed", e);
 		}
 	}
 
-	public Person get_person() {
+	public Person getPerson() {
 		return this.person;
 	}
 }

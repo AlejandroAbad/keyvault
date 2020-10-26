@@ -25,7 +25,7 @@ public class SignRestHandler extends HttpController
 		SignRequestMessageParser incomingMessage = new SignRequestMessageParser(requestBody);
 
 		KeypairDAO keypairDAO = DAO.keypair();
-		Keypair signingKeypair = keypairDAO.get_by_id(incomingMessage.get_cert_id());
+		Keypair signingKeypair = keypairDAO.getById(incomingMessage.getCertId());
 
 		if (signingKeypair == null)
 		{
@@ -33,28 +33,28 @@ public class SignRestHandler extends HttpController
 			return;
 		}
 
-		byte[] payload = incomingMessage.get_payload();
-		HashAlgorithm hashAlgo = incomingMessage.get_hash_algorithm();
-		SignatureFormat signatureFormat = incomingMessage.get_signature_format();
+		byte[] payload = incomingMessage.getPayload();
+		HashAlgorithm hashAlgo = incomingMessage.getHashAlgorithm();
+		SignatureFormat signatureFormat = incomingMessage.getSignatureFormat();
 		byte[] signedMessage = null;
 		boolean outputBase64 = true;
 
 		switch (signatureFormat)
 		{
 			case PKCS1:
-				signedMessage = SignatureFactory.sign_pkcs1(payload, signingKeypair, hashAlgo);
+				signedMessage = SignatureFactory.signPKCS1(payload, signingKeypair, hashAlgo);
 				break;
 			case PKCS7:
-				boolean attachPayload = incomingMessage.attach_payload();
-				boolean includeCAChain = incomingMessage.append_chain();
-				signedMessage = SignatureFactory.sign_pkcs7(payload, signingKeypair, hashAlgo, attachPayload, includeCAChain);
+				boolean attachPayload = incomingMessage.attachPayload();
+				boolean includeCAChain = incomingMessage.appendChain();
+				signedMessage = SignatureFactory.signPKCS7(payload, signingKeypair, hashAlgo, attachPayload, includeCAChain);
 				break;
 			case PADES_CMS:
 			case PADES_BES:
-				signedMessage = SignatureFactory.sign_pades(payload, signingKeypair, hashAlgo, signatureFormat);
+				signedMessage = SignatureFactory.signPAdES(payload, signingKeypair, hashAlgo, signatureFormat);
 				break;
 			case XMLDSIG:
-				signedMessage = SignatureFactory.sign_xmldsig(payload, signingKeypair, incomingMessage.xmldsig_node_id(), hashAlgo, signatureFormat);
+				signedMessage = SignatureFactory.signXmlDSig(payload, signingKeypair, incomingMessage.xmldsigNodeId(), hashAlgo, signatureFormat);
 				outputBase64 = false;
 				break;
 			default:
@@ -62,7 +62,7 @@ public class SignRestHandler extends HttpController
 				return;
 		}
 
-		SignResponseMessage response = new SignResponseMessage(signedMessage, incomingMessage.get_signature_format(), signingKeypair.getIdentifier(), outputBase64);
+		SignResponseMessage response = new SignResponseMessage(signedMessage, incomingMessage.getSignatureFormat(), signingKeypair.getIdentifier(), outputBase64);
 		t.response.send(response, 200);
 	}
 

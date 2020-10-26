@@ -6,14 +6,14 @@ import org.json.simple.JSONObject;
 import es.hefame.hcore.JsonEncodable;
 
 public class AuthCheckResponse implements JsonEncodable {
-	private String user_id = null;
+	private String userId = null;
 	private boolean authenticated = false;
-	private String display_name = null;
+	private String displayName = null;
 
-	public AuthCheckResponse(String user_id, boolean authenticated, String display_name) {
-		this.user_id = user_id;
+	public AuthCheckResponse(String userId, boolean authenticated, String displayName) {
+		this.userId = userId;
 		this.authenticated = authenticated;
-		this.display_name = display_name;
+		this.displayName = displayName;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -21,10 +21,10 @@ public class AuthCheckResponse implements JsonEncodable {
 	public JSONAware jsonEncode() {
 		JSONObject root = new JSONObject();
 		root.put("authenticated", authenticated);
-		if (user_id != null)
-			root.put("user_id", user_id);
-		if (display_name != null)
-			root.put("display_name", display_name);
+		if (userId != null)
+			root.put("user_id", userId);
+		if (displayName != null)
+			root.put("display_name", displayName);
 		return root;
 
 	}

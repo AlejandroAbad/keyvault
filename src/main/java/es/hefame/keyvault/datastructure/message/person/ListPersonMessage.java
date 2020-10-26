@@ -11,7 +11,7 @@ import es.hefame.keyvault.datastructure.model.Person;
 public class ListPersonMessage implements JsonEncodable
 {
 
-	public List<Person> people = new LinkedList<Person>();
+	private List<Person> people = new LinkedList<>();
 
 	public ListPersonMessage(List<Person> people)
 	{
@@ -34,6 +34,10 @@ public class ListPersonMessage implements JsonEncodable
 			root.add(d.jsonEncode());
 		}
 		return root;
+	}
+
+	public List<Person> getPeople() {
+		return this.people;
 	}
 
 }

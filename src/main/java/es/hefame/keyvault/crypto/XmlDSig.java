@@ -37,15 +37,15 @@ public class XmlDSig {
 
 	}
 
-	private static Logger L = LogManager.getLogger();
+	private static Logger logger = LogManager.getLogger();
 
-	public static byte[] sign(byte[] payload, Keypair keypair, String nodeId, HashAlgorithm hash_algorithm,
-			SignatureFormat signature_format) throws HttpException {
+	public static byte[] sign(byte[] payload, Keypair keypair, String nodeId, HashAlgorithm hashAlgorithm,
+			SignatureFormat signatureFormat) throws HttpException {
 		if (nodeId.charAt(0) != '#') {
 			nodeId = '#' + nodeId;
 		}
 
-		if (hash_algorithm != null && signature_format != null) {
+		if (hashAlgorithm != null && signatureFormat != null) {
 			// Esto lo pongo pa que no de porculo el ESLint
 		}
 
@@ -93,8 +93,8 @@ public class XmlDSig {
 			return bos.toByteArray();
 
 		} catch (Exception ex) {
-			L.error("Ocurrio un error al realizar la firma");
-			L.catching(ex);
+			logger.error("Ocurrio un error al realizar la firma");
+			logger.catching(ex);
 
 			throw new HttpException(400, ex.getMessage());
 		}

@@ -19,18 +19,14 @@ import es.hefame.keyvault.controller.rest.SignRestHandler;
 import es.hefame.keyvault.dao.DAO;
 import es.hefame.keyvault.util.auth.DomainPasswordMatcher;
 
-
-public class KeyvaultServer
-{
+public class KeyvaultServer {
 	private static Logger logger = LogManager.getLogger();
 
-	public static void main(String[] args) throws Exception
-	{
+	public static void main(String[] args) throws Exception {
 
-		DAO.set_provider(Conf.get("dao.provider", "Testing"));
+		DAO.setProvider(Conf.get("dao.provider", "Testing"));
 
-		try
-		{
+		try {
 			int port = Conf.get("http.port", 8080);
 			int maxConnections = Conf.get("http.maxConnections", 10);
 
@@ -43,16 +39,15 @@ public class KeyvaultServer
 			routes.put("/rest/authcheck", new AuthCheckRestHandler());
 
 			HttpService server = new HttpService(port, maxConnections, routes);
-			HttpController.setDefaultAuthenticator(new BasicAuthenticator("HefameKeyVault", new DomainPasswordMatcher()));
+			HttpController
+					.setDefaultAuthenticator(new BasicAuthenticator("HefameKeyVault", new DomainPasswordMatcher()));
 
 			ShutdownHook shutdownHook = new ShutdownHook(server);
 			Runtime.getRuntime().addShutdownHook(shutdownHook);
 
 			logger.info("Arrancando servidor HTTP en el puerto {}", port);
 			server.start();
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			logger.fatal("Abortando la ejecución del servidor debido a una excepción");
 			logger.catching(Level.FATAL, e);
 			System.exit(2);

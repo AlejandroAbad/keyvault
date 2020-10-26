@@ -17,48 +17,48 @@ import es.hefame.keyvault.dao.mariadb.MariaDbConnection;
 public class LocalDomain extends Domain {
 	private static Logger L = LogManager.getLogger();
 
-	private String auth_table_name;
-	private String user_col_name;
-	private String pass_col_name;
+	private String authTableName;
+	private String userColName;
+	private String passColName;
 
-	private String auth_query;
+	private String authQuery;
 
-	public LocalDomain(String identifier, JSONObject connection_data) throws HttpException {
+	public LocalDomain(String identifier, JSONObject connectionData) throws HttpException {
 		super(identifier);
-		if (connection_data == null) {
+		if (connectionData == null) {
 			throw new HttpException(400, "No se especifican datos de conexion al dominio");
 		}
 
-		this.setConnectionData(connection_data);
+		this.setConnectionData(connectionData);
 
-		this.auth_table_name = (String) connection_data.get("auth_table_name");
-		this.user_col_name = (String) connection_data.get("user_col_name");
-		this.pass_col_name = (String) connection_data.get("pass_col_name");
+		this.authTableName = (String) connectionData.get("auth_table_name");
+		this.userColName = (String) connectionData.get("user_col_name");
+		this.passColName = (String) connectionData.get("pass_col_name");
 
-		if (auth_table_name == null) {
+		if (authTableName == null) {
 			throw new HttpException(400, "El campo 'auth_table_name' debe especificarse");
 		}
-		if (user_col_name == null) {
+		if (userColName == null) {
 			throw new HttpException(400, "El campo 'user_col_name' debe especificarse");
 		}
-		if (pass_col_name == null) {
+		if (passColName == null) {
 			throw new HttpException(400, "El campo 'pass_col_name' debe especificarse");
 		}
 
-		this.auth_query = "SELECT " + this.pass_col_name + " FROM " + this.auth_table_name + " WHERE "
-				+ this.user_col_name + " = ?";
+		this.authQuery = "SELECT " + this.passColName + " FROM " + this.authTableName + " WHERE "
+				+ this.userColName + " = ?";
 		this.setConnectionData(jsonEncodeConnectionData());
 	}
 
-	public LocalDomain(String identifier, String auth_table_name, String user_col_name, String pass_col_name) {
+	public LocalDomain(String identifier, String authTableName, String userColName, String passColName) {
 		super(identifier);
 
-		this.auth_table_name = auth_table_name;
-		this.user_col_name = user_col_name;
-		this.pass_col_name = pass_col_name;
+		this.authTableName = authTableName;
+		this.userColName = userColName;
+		this.passColName = passColName;
 
-		this.auth_query = "SELECT " + this.pass_col_name + " FROM " + this.auth_table_name + " WHERE "
-				+ this.user_col_name + " = ?";
+		this.authQuery = "SELECT " + this.passColName + " FROM " + this.authTableName + " WHERE "
+				+ this.userColName + " = ?";
 		this.setConnectionData(jsonEncodeConnectionData());
 	}
 
@@ -68,14 +68,14 @@ public class LocalDomain extends Domain {
 	}
 
 	@Override
-	public boolean authenticate(String user_fqdn, String password, IHttpRequest t) throws HException {
+	public boolean authenticate(String userFQDN, String password, IHttpRequest t) throws HException {
 
 		t.setInternalValue(DOMAIN_ID, this.getIdentifier());
 		t.setInternalValue(DOMAIN_TYPE, this.getDomainType());
 
-		String person_name = Domain.getPersonNameFromFQDN(user_fqdn);
-		t.setInternalValue(USER_NAME, person_name);
-		t.setInternalValue(USER_ID, user_fqdn);
+		String personName = Domain.getPersonNameFromFQDN(userFQDN);
+		t.setInternalValue(USER_NAME, personName);
+		t.setInternalValue(USER_ID, userFQDN);
 
 		Connection conn = null;
 		PreparedStatement st = null;
@@ -83,18 +83,18 @@ public class LocalDomain extends Domain {
 		try {
 			conn = MariaDbConnection.getConnection();
 
-			L.trace("Ejecutando [{}] para el usuario [{}]", auth_query, person_name);
+			L.trace("Ejecutando [{}] para el usuario [{}]", authQuery, personName);
 
-			t.setInternalValue(USER_NAME, person_name);
-			t.setInternalValue(USER_ID, user_fqdn);
+			t.setInternalValue(USER_NAME, personName);
+			t.setInternalValue(USER_ID, userFQDN);
 
-			st = conn.prepareStatement(this.auth_query);
-			st.setString(1, person_name);
+			st = conn.prepareStatement(this.authQuery);
+			st.setString(1, personName);
 			rs = st.executeQuery();
 
 			if (rs.next()) {
-				String stored_passwd = rs.getString(this.pass_col_name);
-				return password.equals(stored_passwd);
+				String storedPasswd = rs.getString(this.passColName);
+				return password.equals(storedPasswd);
 			} else {
 				return false;
 			}
@@ -111,9 +111,9 @@ public class LocalDomain extends Domain {
 	@Override
 	public JSONObject jsonEncodeConnectionData() {
 		JSONObject root = new JSONObject();
-		root.put("auth_table_name", this.auth_table_name);
-		root.put("user_col_name", this.user_col_name);
-		root.put("pass_col_name", this.pass_col_name);
+		root.put("auth_table_name", this.authTableName);
+		root.put("user_col_name", this.userColName);
+		root.put("pass_col_name", this.passColName);
 		return root;
 	}
 

@@ -12,67 +12,67 @@ import es.hefame.keyvault.datastructure.model.domain.Domain;
 
 public class Person implements es.hefame.hcore.JsonEncodable {
 	private String name;
-	private String domain_id;
+	private String domainId;
 
 	public Person(String fqdn) {
 		this.name = Domain.getPersonNameFromFQDN(fqdn);
-		this.domain_id = Domain.getDomainIdFromFQDN(fqdn);
+		this.domainId = Domain.getDomainIdFromFQDN(fqdn);
 	}
 
 	public Person(String name, String domain) {
 		this.name = name;
-		this.domain_id = domain;
+		this.domainId = domain;
 	}
 
-	public String get_name() {
+	public String getName() {
 		return name;
 	}
 
-	public String get_identifier() {
-		DomainDAO domain_datasource = DAO.domain();
+	public String getIdentifier() {
+		DomainDAO domainDAO = DAO.domain();
 		try {
-			Domain person_domain = domain_datasource.get_by_id(domain_id);
-			return person_domain.generateFQDN(this);
+			Domain personDomain = domainDAO.getById(domainId);
+			return personDomain.generateFQDN(this);
 		} catch (HException e) {
-			return this.name + '@' + this.domain_id;
+			return this.name + '@' + this.domainId;
 		}
 
 	}
 
-	public String get_domain_id() {
-		return domain_id;
+	public String getDomainId() {
+		return domainId;
 	}
 
-	public Domain get_domain() throws HException {
-		return DAO.domain().get_by_id(domain_id);
+	public Domain getDomain() throws HException {
+		return DAO.domain().getById(domainId);
 	}
 
-	public List<Keypair> get_owning_keypairs() throws HException {
-		KeypairDAO keypair_datasource = DAO.keypair();
-		return keypair_datasource.get_owned_by(this);
+	public List<Keypair> getOwningKeypairs() throws HException {
+		KeypairDAO keypairDAO = DAO.keypair();
+		return keypairDAO.getOwnedBy(this);
 	}
 
-	public void add_owning_keypair(Keypair keypair) throws HException {
-		KeypairDAO keypair_datasource = DAO.keypair();
-		keypair_datasource.insert(keypair);
+	public void addOwningKeypair(Keypair keypair) throws HException {
+		KeypairDAO keypairDAO = DAO.keypair();
+		keypairDAO.insert(keypair);
 	}
 
-	public void delete_owning_keypair(Keypair keypair) throws HException {
-		KeypairDAO keypair_datasource = DAO.keypair();
-		keypair_datasource.delete(keypair);
+	public void deleteOwningKeypair(Keypair keypair) throws HException {
+		KeypairDAO keypairDAO = DAO.keypair();
+		keypairDAO.delete(keypair);
 	}
 
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		sb.append(this.getClass().getName()).append(" [");
-		sb.append("\n\tName: ").append(this.get_name());
-		sb.append("\n\tDomain ID: ").append(this.get_domain_id());
-		sb.append("\n\tIdentifier: ").append(this.get_identifier());
+		sb.append("\n\tName: ").append(this.getName());
+		sb.append("\n\tDomain ID: ").append(this.getDomainId());
+		sb.append("\n\tIdentifier: ").append(this.getIdentifier());
 
 		sb.append("\n\tOwning key pairs: {\n\t\t");
 		try {
-			for (Keypair owned_keypair : this.get_owning_keypairs()) {
+			for (Keypair owned_keypair : this.getOwningKeypairs()) {
 				sb.append(owned_keypair.toString().replace("\n", "\n\t\t"));
 			}
 		} catch (HException e) {
@@ -87,9 +87,9 @@ public class Person implements es.hefame.hcore.JsonEncodable {
 	@Override
 	public JSONObject jsonEncode() {
 		JSONObject root = new JSONObject();
-		root.put("id", this.get_identifier());
-		root.put("name", this.get_name());
-		root.put("domain", this.get_domain_id());
+		root.put("id", this.getIdentifier());
+		root.put("name", this.getName());
+		root.put("domain", this.getDomainId());
 		return root;
 	}
 
@@ -97,7 +97,7 @@ public class Person implements es.hefame.hcore.JsonEncodable {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((domain_id == null) ? 0 : domain_id.hashCode());
+		result = prime * result + ((domainId == null) ? 0 : domainId.hashCode());
 		result = prime * result + ((name == null) ? 0 : name.hashCode());
 		return result;
 	}
@@ -111,10 +111,10 @@ public class Person implements es.hefame.hcore.JsonEncodable {
 		if (getClass() != obj.getClass())
 			return false;
 		Person other = (Person) obj;
-		if (domain_id == null) {
-			if (other.domain_id != null)
+		if (domainId == null) {
+			if (other.domainId != null)
 				return false;
-		} else if (!domain_id.equals(other.domain_id))
+		} else if (!domainId.equals(other.domainId))
 			return false;
 		if (name == null) {
 			if (other.name != null)

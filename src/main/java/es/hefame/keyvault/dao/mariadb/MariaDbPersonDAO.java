@@ -17,7 +17,7 @@ public class MariaDbPersonDAO implements PersonDAO
 	//private static Logger L = LogManager.getLogger();
 
 	@Override
-	public Person get_by_fqdn(String fqdn) throws HException
+	public Person getByFQDN(String fqdn) throws HException
 	{
 		Connection conn = null;
 		PreparedStatement st = null;
@@ -53,14 +53,14 @@ public class MariaDbPersonDAO implements PersonDAO
 	}
 
 	@Override
-	public List<Person> get_by_domain(Domain d) throws HException
+	public List<Person> getByDomain(Domain d) throws HException
 	{
-		if (d != null) return this.get_by_domain_id(d.getIdentifier());
+		if (d != null) return this.getByDomainId(d.getIdentifier());
 		else return new LinkedList<Person>();
 	}
 
 	@Override
-	public List<Person> get_by_domain_id(String d) throws HException
+	public List<Person> getByDomainId(String d) throws HException
 	{
 		List<Person> people = new LinkedList<Person>();
 		Connection conn = null;
@@ -96,7 +96,7 @@ public class MariaDbPersonDAO implements PersonDAO
 	}
 
 	@Override
-	public List<Person> get_list() throws HException
+	public List<Person> getList() throws HException
 	{
 		List<Person> people = new LinkedList<Person>();
 		Connection conn = null;
@@ -140,8 +140,8 @@ public class MariaDbPersonDAO implements PersonDAO
 			String selectSQL = "INSERT INTO person (name, domain_id) VALUES (?, ?)";
 			st = conn.prepareStatement(selectSQL);
 
-			st.setString(1, person.get_name());
-			st.setString(2, person.get_domain_id());
+			st.setString(1, person.getName());
+			st.setString(2, person.getDomainId());
 			int result = st.executeUpdate();
 
 			if (result == 1)
@@ -177,7 +177,7 @@ public class MariaDbPersonDAO implements PersonDAO
 	public boolean delete(Person person) throws HException
 	{
 		if (person == null) return false;
-		return this.delete(person.get_identifier());
+		return this.delete(person.getIdentifier());
 	}
 
 	@Override

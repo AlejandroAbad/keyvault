@@ -44,7 +44,7 @@ public abstract class Domain implements JsonEncodable {
 
 	public String generateFQDN(Person signer) {
 		StringBuilder sb = new StringBuilder();
-		sb.append(signer.get_name()).append('@').append(this.getIdentifier());
+		sb.append(signer.getName()).append('@').append(this.getIdentifier());
 		return sb.toString();
 	}
 

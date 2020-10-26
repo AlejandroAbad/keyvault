@@ -13,7 +13,7 @@ import es.hefame.keyvault.datastructure.message.acronym.KeypairFormat;
 import es.hefame.keyvault.datastructure.model.Keypair;
 
 public class KeypairInsertMessageParser {
-	private static Logger L = LogManager.getLogger();
+	private static Logger logger = LogManager.getLogger();
 	private Keypair keypair;
 
 	public KeypairInsertMessageParser(byte[] request) throws HException {
@@ -50,15 +50,15 @@ public class KeypairInsertMessageParser {
 						passphrase = "";
 					}
 
-					L.trace("Base 64: [{}]", payload);
+					logger.trace("Base 64: [{}]", payload);
 
-					byte[] pkcs12_data = ByteArrayConverter.fromBase64(payload);
+					byte[] pkcs12data = ByteArrayConverter.fromBase64(payload);
 
-					L.trace("Tamano decodificado: [{}]", payload);
+					logger.trace("Tamano decodificado: [{}]", payload);
 
 					// byte[] pkcs12_data = new BASE64Decoder().decodeBuffer(payload);
 
-					this.keypair = new Keypair(id, pkcs12_data, owner, passphrase.toCharArray());
+					this.keypair = new Keypair(id, pkcs12data, owner, passphrase.toCharArray());
 					break;
 				default:
 					throw new HttpException(400, "Format value is invalid");
@@ -68,7 +68,7 @@ public class KeypairInsertMessageParser {
 		}
 	}
 
-	public Keypair get_keypair() {
+	public Keypair getKeypair() {
 		return this.keypair;
 	}
 

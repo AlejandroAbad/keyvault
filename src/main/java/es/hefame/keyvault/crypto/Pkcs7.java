@@ -41,32 +41,32 @@ public class Pkcs7
 		Security.addProvider(new BouncyCastleProvider());
 	}
 
-	public static byte[] sign(byte[] data, X509Certificate cert, Key key, HashAlgorithm hash_algorithm, List<X509Certificate> ca_certs, boolean attach_payload) throws HttpException
+	public static byte[] sign(byte[] data, X509Certificate cert, Key key, HashAlgorithm hashAlgorithm, List<X509Certificate> caCerts, boolean attachPayload) throws HttpException
 	{
-		SignatureAlgorithm signature_algorithm = SignatureAlgorithm.build(hash_algorithm, KeyAlgorithm.build(key.getAlgorithm()));
+		SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.build(hashAlgorithm, KeyAlgorithm.build(key.getAlgorithm()));
 
 		try
 		{
-			PrivateKey private_key = (PrivateKey) key;
+			PrivateKey privateKey = (PrivateKey) key;
 
-			ContentSigner content_signer = new JcaContentSignerBuilder(signature_algorithm.name()).setProvider("BC")
-					.build(private_key);
-			DigestCalculatorProvider digest_calculator = new JcaDigestCalculatorProviderBuilder().setProvider("BC").build();
-			JcaSignerInfoGeneratorBuilder signer_info_builder = new JcaSignerInfoGeneratorBuilder(digest_calculator);
-			SignerInfoGenerator sig = signer_info_builder.build(content_signer, cert);
+			ContentSigner contentSigner = new JcaContentSignerBuilder(signatureAlgorithm.name()).setProvider("BC")
+					.build(privateKey);
+			DigestCalculatorProvider digestCalculator = new JcaDigestCalculatorProviderBuilder().setProvider("BC").build();
+			JcaSignerInfoGeneratorBuilder signerInfoBuilder = new JcaSignerInfoGeneratorBuilder(digestCalculator);
+			SignerInfoGenerator sig = signerInfoBuilder.build(contentSigner, cert);
 			CMSSignedDataGenerator generator = new CMSSignedDataGenerator();
 			generator.addSignerInfoGenerator(sig);
 
-			if (ca_certs != null)
+			if (caCerts != null)
 			{
-				JcaCertStore cert_chain_store = new JcaCertStore(ca_certs);
-				generator.addCertificates(cert_chain_store);
+				JcaCertStore certChainStore = new JcaCertStore(caCerts);
+				generator.addCertificates(certChainStore);
 			}
 
 			CMSTypedData cmsdata = new CMSProcessableByteArray(data);
 			CMSSignedData signeddata;
 
-			signeddata = generator.generate(cmsdata, attach_payload);
+			signeddata = generator.generate(cmsdata, attachPayload);
 			return signeddata.getEncoded();
 
 		}

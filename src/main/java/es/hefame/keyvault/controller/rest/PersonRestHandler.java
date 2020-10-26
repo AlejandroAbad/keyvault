@@ -22,22 +22,22 @@ public class PersonRestHandler extends HttpController
 	{
 		// String authenticated_user_id = (String) t.request.get_attribute("user_id");
 
-		String person_id = t.request.getURIField(2);
+		String personId = t.request.getURIField(2);
 		String subcommand = t.request.getURIField(3);
 
 		// GET /rest/person
-		if (person_id == null)
+		if (personId == null)
 		{
 			// AuthzManager.check(AuthzManager.in_local_domain(authenticated_user_id));
 
-			List<Person> people = DAO.person().get_list();
+			List<Person> people = DAO.person().getList();
 			ListPersonMessage message = new ListPersonMessage(people);
 			t.response.send(message, 200);
 			return;
 		}
 
 		// GET /rest/person/<person_id>[/*]
-		Person person = DAO.person().get_by_fqdn(person_id);
+		Person person = DAO.person().getByFQDN(personId);
 		if (person == null)
 		{
 			// AuthzManager.check(AuthzManager.in_local_domain(authenticated_user_id));
@@ -56,10 +56,10 @@ public class PersonRestHandler extends HttpController
 		switch (subcommand.toLowerCase())
 		{
 			case "keypairs":
-				KeypairDAO keypair_datasource = DAO.keypair();
-				List<Keypair> keypair_list = keypair_datasource.get_owned_by(person);
-				KeypairListMessage people_message = new KeypairListMessage(keypair_list);
-				t.response.send(people_message, 200);
+				KeypairDAO keypairDAO = DAO.keypair();
+				List<Keypair> keypairList = keypairDAO.getOwnedBy(person);
+				KeypairListMessage peopleMessage = new KeypairListMessage(keypairList);
+				t.response.send(peopleMessage, 200);
 				return;
 			default:
 				t.response.send(person, 200);
@@ -75,18 +75,12 @@ public class PersonRestHandler extends HttpController
 		// AuthzManager.check(AuthzManager.in_local_domain(authenticated_user_id));
 
 		PersonChangeMessageParser incoming = new PersonChangeMessageParser(t.request.getBodyAsByteArray());
-		Person p = incoming.get_person();
+		Person p = incoming.getPerson();
 		DAO.person().insert(p);
-		p = DAO.person().get_by_fqdn(p.get_identifier());
+		p = DAO.person().getByFQDN(p.getIdentifier());
 		t.response.send(p, 201);
 	}
 
-	@Override
-	protected void put(HttpConnection t) throws HException, IOException
-	{
-		// TODO:
-		super.put(t);
-	}
 
 	@Override
 	protected void delete(HttpConnection t) throws HException, IOException
@@ -102,7 +96,7 @@ public class PersonRestHandler extends HttpController
 			return;
 		}
 
-		Person person = DAO.person().get_by_fqdn(personId);
+		Person person = DAO.person().getByFQDN(personId);
 		if (person == null)
 		{
 			t.response.send(new HttpException(404, "No se encuentra la persona especificada"));

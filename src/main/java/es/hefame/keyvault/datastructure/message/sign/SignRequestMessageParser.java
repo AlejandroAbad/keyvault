@@ -12,22 +12,23 @@ import es.hefame.keyvault.datastructure.message.acronym.HashAlgorithm;
 import es.hefame.keyvault.datastructure.message.acronym.PayloadEncoding;
 import es.hefame.keyvault.datastructure.message.acronym.SignatureFormat;
 
+// TODO: Esta clase debe poder extenderse para aceptar opciones especificas a cada metodo de firma.
 public class SignRequestMessageParser {
-	private static Logger L = LogManager.getLogger();
+	private static Logger logger = LogManager.getLogger();
 
-	private String cert_id;
+	private String certId;
 	private byte[] payload;
-	private PayloadEncoding payload_encoding;
-	private SignatureFormat signature_format;
-	private HashAlgorithm hash_algorithm;
+	private PayloadEncoding payloadEncoding;
+	private SignatureFormat signatureFormat;
+	private HashAlgorithm hashAlgorithm;
 
 	// Format-specific options
 	// # PKCS-7
-	private boolean append_ca_chain;
-	private boolean attach_payload;
+	private boolean appendCAChain;
+	private boolean attachPayload;
 
 	// # XMLDSIG
-	private String xmldsig_node_id;
+	private String xmldsigNodeId;
 
 	public SignRequestMessageParser(byte[] request) throws HException {
 		JSONParser parser = new JSONParser();
@@ -40,85 +41,85 @@ public class SignRequestMessageParser {
 			JSONObject jsonObject = (JSONObject) obj;
 
 			// Certificate ID
-			this.cert_id = (String) jsonObject.get("cert_id");
-			if (cert_id == null) {
+			this.certId = (String) jsonObject.get("cert_id");
+			if (certId == null) {
 				throw new HttpException(400, "No certificate ID was specified");
 			}
 
 			// Signature Type
-			signature_format = SignatureFormat.build((String) jsonObject.get("signature_format"));
+			signatureFormat = SignatureFormat.build((String) jsonObject.get("signature_format"));
 
 			// Payload encoding
-			this.payload_encoding = PayloadEncoding.build((String) jsonObject.get("payload_encoding"));
+			this.payloadEncoding = PayloadEncoding.build((String) jsonObject.get("payload_encoding"));
 
 			// Signature Algorithm
-			hash_algorithm = HashAlgorithm.build((String) jsonObject.get("hash_algorithm"));
+			hashAlgorithm = HashAlgorithm.build((String) jsonObject.get("hash_algorithm"));
 
 			// Payload
-			String raw_payload = (String) jsonObject.get("payload");
-			if (raw_payload == null) {
+			String rawPayload = (String) jsonObject.get("payload");
+			if (rawPayload == null) {
 				throw new HttpException(400, "No payload was supplied");
 			}
-			this.payload = payload_encoding.decode(raw_payload);
+			this.payload = payloadEncoding.decode(rawPayload);
 
 			Object o;
 			// PKCS#7
 			// Attach payload ?
-			this.attach_payload = true;
+			this.attachPayload = true;
 			o = jsonObject.get("attach_payload");
 			if (o != null) {
-				this.attach_payload = (Boolean) o;
+				this.attachPayload = (Boolean) o;
 			}
 
 			// Append ca certs ?
-			this.append_ca_chain = true;
+			this.appendCAChain = true;
 			o = jsonObject.get("append_ca_chain");
 			if (o != null) {
-				this.append_ca_chain = (Boolean) o;
+				this.appendCAChain = (Boolean) o;
 			}
 
 			// XMLDSIG
 			// Node ID
-			this.xmldsig_node_id = "data";
+			this.xmldsigNodeId = "data";
 			o = jsonObject.get("xmldsig_node_id");
 			if (o != null) {
-				this.xmldsig_node_id = o.toString();
+				this.xmldsigNodeId = o.toString();
 			}
 
 		} catch (ClassCastException | ParseException e) {
-			L.error("Error al deserializar el JSON");
-			L.catching(e);
+			logger.error("Error al deserializar el JSON");
+			logger.catching(e);
 			throw new HttpException(400, "Error al deserializar el JSON");
 		}
 
 	}
 
-	public String get_cert_id() {
-		return cert_id;
+	public String getCertId() {
+		return certId;
 	}
 
-	public byte[] get_payload() {
+	public byte[] getPayload() {
 		return this.payload;
 	}
 
-	public SignatureFormat get_signature_format() {
-		return signature_format;
+	public SignatureFormat getSignatureFormat() {
+		return signatureFormat;
 	}
 
-	public HashAlgorithm get_hash_algorithm() {
-		return hash_algorithm;
+	public HashAlgorithm getHashAlgorithm() {
+		return hashAlgorithm;
 	}
 
-	public boolean append_chain() {
-		return append_ca_chain;
+	public boolean appendChain() {
+		return appendCAChain;
 	}
 
-	public boolean attach_payload() {
-		return attach_payload;
+	public boolean attachPayload() {
+		return attachPayload;
 	}
 
-	public String xmldsig_node_id() {
-		return xmldsig_node_id;
+	public String xmldsigNodeId() {
+		return xmldsigNodeId;
 	}
 
 }

@@ -54,22 +54,22 @@ public class LdapDomain extends Domain {
 		this.setConnectionData(jsonEncodeConnectionData());
 	}
 
-	public LdapDomain(String identifier, String ldap_uri, String search_branch, String search_filter)
+	public LdapDomain(String identifier, String ldapURI, String searchBranch, String searchFilter)
 			throws HttpException {
 		super(identifier);
-		if (ldap_uri == null) {
+		if (ldapURI == null) {
 			throw new HttpException(400, "'ldap_uri' cannot be null");
 		}
-		if (search_branch == null) {
+		if (searchBranch == null) {
 			throw new HttpException(400, "'search_branch' cannot be null");
 		}
-		if (search_filter == null) {
+		if (searchFilter == null) {
 			throw new HttpException(400, "'search_filter' cannot be null");
 		}
 
-		this.ldap_uri = ldap_uri;
-		this.search_branch = search_branch;
-		this.search_filter = search_filter;
+		this.ldap_uri = ldapURI;
+		this.search_branch = searchBranch;
+		this.search_filter = searchFilter;
 		this.setConnectionData(jsonEncodeConnectionData());
 	}
 
@@ -78,39 +78,39 @@ public class LdapDomain extends Domain {
 		return "ldap";
 	}
 
-	public String get_ldap_uri() {
+	public String getLdapURI() {
 		return ldap_uri;
 	}
 
-	public String get_search_branch() {
+	public String getSearchBranch() {
 		return search_branch;
 	}
 
-	public String get_search_filter() {
+	public String getSearchFilter() {
 		return search_filter;
 	}
 
 	@Override
 	public String generateFQDN(Person signer) {
 		StringBuilder sb = new StringBuilder();
-		sb.append(signer.get_name().toLowerCase()).append('@').append(this.getIdentifier());
+		sb.append(signer.getName().toLowerCase()).append('@').append(this.getIdentifier());
 		return sb.toString();
 	}
 
 	@Override
-	public boolean authenticate(String user_fqdn, String password, IHttpRequest t) throws HttpException {
+	public boolean authenticate(String userFQDN, String password, IHttpRequest t) throws HttpException {
 
 		t.setInternalValue(DOMAIN_ID, this.getIdentifier());
 		t.setInternalValue(DOMAIN_TYPE, this.getDomainType());
 
-		String personName = Domain.getPersonNameFromFQDN(user_fqdn);
+		String personName = Domain.getPersonNameFromFQDN(userFQDN);
 		t.setInternalValue(USER_NAME, personName);
-		t.setInternalValue(USER_ID, user_fqdn);
+		t.setInternalValue(USER_ID, userFQDN);
 
 		Hashtable<String, String> env = new Hashtable<>();
 		env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
 		env.put(Context.PROVIDER_URL, this.ldap_uri);
-		env.put(Context.SECURITY_PRINCIPAL, user_fqdn);
+		env.put(Context.SECURITY_PRINCIPAL, userFQDN);
 		env.put(Context.SECURITY_CREDENTIALS, password);
 		env.put(Context.REFERRAL, "follow");
 
@@ -122,11 +122,11 @@ public class LdapDomain extends Domain {
 			String[] attrIDs = { "cn", "uid", "memberOf" };
 			ctls.setReturningAttributes(attrIDs);
 			ctls.setSearchScope(SearchControls.SUBTREE_SCOPE);
-			String parsed_filter = this.search_filter.replace("{%u}", personName);
+			String parsedFilter = this.search_filter.replace("{%u}", personName);
 
 			L.debug("Autenticando al usuario [{}] contra el LDAP [{}] en la rama [{}] con filtro [{}]", personName,
-					this.ldap_uri, this.search_branch, parsed_filter);
-			NamingEnumeration<?> answer = ctx.search(this.search_branch, parsed_filter, ctls);
+					this.ldap_uri, this.search_branch, parsedFilter);
+			NamingEnumeration<?> answer = ctx.search(this.search_branch, parsedFilter, ctls);
 
 			while (answer.hasMore()) {
 				SearchResult rslt = (SearchResult) answer.next();
@@ -139,16 +139,16 @@ public class LdapDomain extends Domain {
 				t.setInternalValue(USER_LDAP_CN, cn);
 				t.setInternalValue(USER_LDAP_UID, uid);
 
-				List<String> user_groups = new LinkedList<>();
+				List<String> userGroups = new LinkedList<>();
 				NamingEnumeration<?> groups = attrs.get("memberOf").getAll();
 				while (groups.hasMore()) {
 
 					String s = groups.next().toString();
-					user_groups.add(s);
+					userGroups.add(s);
 				}
 
-				L.debug("Estableciendo grupos del usuario: {}", user_groups);
-				t.setInternalValue(USER_GROUPS, user_groups);
+				L.debug("Estableciendo grupos del usuario: {}", userGroups);
+				t.setInternalValue(USER_GROUPS, userGroups);
 			}
 
 			return true;
@@ -163,9 +163,9 @@ public class LdapDomain extends Domain {
 	@SuppressWarnings("unchecked")
 	public JSONObject jsonEncodeConnectionData() {
 		JSONObject root = new JSONObject();
-		root.put("ldap_uri", this.get_ldap_uri());
-		root.put("search_branch", this.get_search_branch());
-		root.put("search_filter", this.get_search_filter());
+		root.put("ldap_uri", this.getLdapURI());
+		root.put("search_branch", this.getSearchBranch());
+		root.put("search_filter", this.getSearchFilter());
 		return root;
 	}
 

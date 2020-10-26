@@ -7,9 +7,9 @@ import es.hefame.keyvault.datastructure.model.domain.Domain;
 
 public interface DomainDAO
 {
-	public Domain get_by_id(String id) throws HException;
+	public Domain getById(String id) throws HException;
 
-	public List<Domain> get_list() throws HException;
+	public List<Domain> getList() throws HException;
 
 	public boolean insert(Domain domain) throws HException;
 

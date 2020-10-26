@@ -16,22 +16,22 @@ public class AuthzManager {
 	}
 
 	public static final String LOCAL_DOMAIN_NAME = "local";
-	private static Logger L = LogManager.getLogger();
+	private static Logger logger = LogManager.getLogger();
 
 	public static void check(boolean condition) throws HttpException {
 		check(condition, "No estas autorizado");
 	}
 
-	public static void check(boolean condition, String error_message) throws HttpException {
+	public static void check(boolean condition, String errorMessage) throws HttpException {
 		if (!condition)
-			throw new HttpException(403, error_message);
+			throw new HttpException(403, errorMessage);
 	}
 
 	public static boolean isPerson(Person input, String personId) {
 		if (personId == null || input == null) {
 			return false;
 		}
-		return isPerson(input.get_identifier(), personId);
+		return isPerson(input.getIdentifier(), personId);
 	}
 
 	public static boolean isPerson(String input, String personId) {
@@ -45,7 +45,7 @@ public class AuthzManager {
 		if (person == null || input == null) {
 			return false;
 		}
-		return person.get_name().equalsIgnoreCase(input);
+		return person.getName().equalsIgnoreCase(input);
 	}
 
 	public static boolean isPerson(Person input, Person person) {
@@ -55,8 +55,8 @@ public class AuthzManager {
 		return person.equals(input);
 	}
 
-	public static boolean isPerson(String input, Person... person_list) {
-		for (Person person : person_list) {
+	public static boolean isPerson(String input, Person... personList) {
+		for (Person person : personList) {
 			if (isPerson(input, person)) {
 				return true;
 			}
@@ -64,8 +64,8 @@ public class AuthzManager {
 		return false;
 	}
 
-	public static boolean isPerson(Person input, Person... person_list) {
-		for (Person person : person_list) {
+	public static boolean isPerson(Person input, Person... personList) {
+		for (Person person : personList) {
 			if (isPerson(input, person)) {
 				return true;
 			}
@@ -85,15 +85,15 @@ public class AuthzManager {
 			return false;
 		}
 		try {
-			return domain.equals(input.get_domain());
+			return domain.equals(input.getDomain());
 		} catch (HException e) {
-			L.catching(e);
+			logger.catching(e);
 			return false;
 		}
 	}
 
-	public static boolean inDomain(String input, Domain... domain_list) {
-		for (Domain domain : domain_list) {
+	public static boolean inDomain(String input, Domain... domainList) {
+		for (Domain domain : domainList) {
 			if (inDomain(input, domain)) {
 				return true;
 			}
@@ -101,8 +101,8 @@ public class AuthzManager {
 		return false;
 	}
 
-	public static boolean inDomain(Person input, Domain... domain_list) {
-		for (Domain domain : domain_list) {
+	public static boolean inDomain(Person input, Domain... domainList) {
+		for (Domain domain : domainList) {
 			if (inDomain(input, domain)) {
 				return true;
 			}
@@ -115,23 +115,23 @@ public class AuthzManager {
 	}
 
 	public static boolean isKeyOwner(Person input, Keypair keypair) {
-		return keypair.getOwnerId().equalsIgnoreCase(input.get_identifier());
+		return keypair.getOwnerId().equalsIgnoreCase(input.getIdentifier());
 	}
 
-	public static boolean in_local_domain(String input) {
+	public static boolean inLocalDomain(String input) {
 		try {
-			return inDomain(input, DAO.domain().get_by_id(LOCAL_DOMAIN_NAME));
+			return inDomain(input, DAO.domain().getById(LOCAL_DOMAIN_NAME));
 		} catch (HException e) {
-			L.catching(e);
+			logger.catching(e);
 			return false;
 		}
 	}
 
-	public static boolean in_local_domain(Person input) {
+	public static boolean inLocalDomain(Person input) {
 		try {
-			return inDomain(input, DAO.domain().get_by_id(LOCAL_DOMAIN_NAME));
+			return inDomain(input, DAO.domain().getById(LOCAL_DOMAIN_NAME));
 		} catch (HException e) {
-			L.catching(e);
+			logger.catching(e);
 			return false;
 		}
 	}

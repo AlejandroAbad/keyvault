@@ -23,7 +23,7 @@ public class InfoMessage implements JsonEncodable {
 	public JSONAware jsonEncode() {
 		JSONObject root = new JSONObject();
 		if (code != null) {
-			root.put("code", code.intValue());
+			root.put("code", code);
 		}
 		root.put("message", message);
 		return root;

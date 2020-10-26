@@ -34,14 +34,14 @@ public class DomainRestHandler extends HttpController
 		// GET /rest/domain
 		if (domainId == null)
 		{
-			List<Domain> domain_list = DAO.domain().get_list();
-			ListDomainMessage message = new ListDomainMessage(domain_list);
+			List<Domain> domainList = DAO.domain().getList();
+			ListDomainMessage message = new ListDomainMessage(domainList);
 			t.response.send(message, 200);
 			return;
 		}
 
 		// GET /rest/domain/<domain_id>[/*]
-		Domain domain = DAO.domain().get_by_id(domainId);
+		Domain domain = DAO.domain().getById(domainId);
 		if (domain == null)
 		{
 			t.response.send(new HttpException(404, "No se encuenta el dominio con el ID especificado"));
@@ -60,9 +60,9 @@ public class DomainRestHandler extends HttpController
 			// GET /rest/domain/<domain_id>/members
 			case "members":
 				log.info("Peticion para obtener los miembros del dominio [{}]", domain);
-				List<Person> members = DAO.person().get_by_domain(domain);
-				ListPersonMessage people_message = new ListPersonMessage(members);
-				t.response.send(people_message, 200);
+				List<Person> members = DAO.person().getByDomain(domain);
+				ListPersonMessage peopleMessage = new ListPersonMessage(members);
+				t.response.send(peopleMessage, 200);
 				return;
 			// GET /rest/domain/<domain_id>/*
 			default:
@@ -79,9 +79,9 @@ public class DomainRestHandler extends HttpController
 		// AuthzManager.check(AuthzManager.in_local_domain(user_id));
 
 		DomainChangeMessageParser incoming = new DomainChangeMessageParser(t.request.getBodyAsByteArray());
-		Domain d = incoming.get_domain();
+		Domain d = incoming.getDomain();
 		DAO.domain().insert(d);
-		d = DAO.domain().get_by_id(d.getIdentifier());
+		d = DAO.domain().getById(d.getIdentifier());
 		t.response.send(d, 201);
 
 	}
@@ -99,7 +99,7 @@ public class DomainRestHandler extends HttpController
 			return;
 		}
 
-		Domain original = DAO.domain().get_by_id(domainId);
+		Domain original = DAO.domain().getById(domainId);
 		if (original == null)
 		{
 			t.response.send(new HttpException(400, "No se encuentra el dominio especificado"));
@@ -107,9 +107,9 @@ public class DomainRestHandler extends HttpController
 		}
 
 		DomainChangeMessageParser incoming = new DomainChangeMessageParser(domainId, t.request.getBodyAsByteArray());
-		Domain d = incoming.get_domain();
+		Domain d = incoming.getDomain();
 		DAO.domain().update(d);
-		d = DAO.domain().get_by_id(d.getIdentifier());
+		d = DAO.domain().getById(d.getIdentifier());
 		t.response.send(d, 200);
 	}
 
@@ -127,7 +127,7 @@ public class DomainRestHandler extends HttpController
 			return;
 		}
 
-		Domain domain = DAO.domain().get_by_id(domainId);
+		Domain domain = DAO.domain().getById(domainId);
 		if (domain == null)
 		{
 			t.response.send(new HttpException(404, "Dominio no encontrado"));

@@ -1,69 +1,89 @@
 package es.hefame.keyvault.dao;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import es.hefame.hcore.HException;
 
 public class DAO {
-	private static String dao_provider = "Testing";
+
+	private static Logger logger = LogManager.getLogger();
+
+	private DAO() {
+
+	}
+
+	private static String daoProvider = "Testing";
 	private static final String BASE_PACKAGE = "es.hefame.keyvault.dao";
 
-	private static DomainDAO domain_provider = null;
-	private static PersonDAO person_provider = null;
-	private static KeypairDAO keypair_provider = null;
+	private static DomainDAO domainDAO = null;
+	private static PersonDAO personDAO = null;
+	private static KeypairDAO keypairDAO = null;
 
-	public static void set_provider(String dao_provider) throws HException {
-		DAO.dao_provider = dao_provider;
-		DAO.set_domain_dao();
-		DAO.set_person_dao();
-		DAO.set_keypair_dao();
+	public static void setProvider(String daoProvider) throws HException {
+		logger.debug("Estableciendo el proveedor de datos a {}", daoProvider);
+		DAO.daoProvider = daoProvider;
+		DAO.setDomainDAO();
+		DAO.setPersonDAO();
+		DAO.setKeypairDAO();
 	}
 
 	public static DomainDAO domain() {
-		return DAO.domain_provider;
+		return DAO.domainDAO;
 	}
 
 	public static PersonDAO person() {
-		return DAO.person_provider;
+		return DAO.personDAO;
 	}
 
 	public static KeypairDAO keypair() {
-		return DAO.keypair_provider;
+		return DAO.keypairDAO;
 	}
 
 	@SuppressWarnings("unchecked")
-	private static DomainDAO set_domain_dao() throws HException {
-		String class_name = BASE_PACKAGE + "." + dao_provider.toLowerCase() + "." + dao_provider + "DomainDAO";
-		Class<? extends DomainDAO> casting_class;
+	private static DomainDAO setDomainDAO() throws HException {
+		String className = BASE_PACKAGE + "." + daoProvider.toLowerCase() + "." + daoProvider + "DomainDAO";
+		Class<? extends DomainDAO> castingClass;
 		try {
-			casting_class = (Class<? extends DomainDAO>) Class.forName(class_name);
-			DAO.domain_provider = (DomainDAO) casting_class.newInstance();
-			return DAO.domain_provider;
-		} catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
+			castingClass = (Class<? extends DomainDAO>) Class.forName(className);
+			Constructor<? extends DomainDAO> constructor = castingClass.getConstructor();
+			DAO.domainDAO = constructor.newInstance();
+			return DAO.domainDAO;
+		} catch (InvocationTargetException | NoSuchMethodException | SecurityException | InstantiationException
+				| IllegalAccessException | ClassNotFoundException e) {
 			throw new HException(e.getMessage(), e);
 		}
 	}
 
 	@SuppressWarnings("unchecked")
-	private static PersonDAO set_person_dao() throws HException {
-		String class_name = BASE_PACKAGE + "." + dao_provider.toLowerCase() + "." + dao_provider + "PersonDAO";
-		Class<? extends PersonDAO> casting_class;
+	private static PersonDAO setPersonDAO() throws HException {
+		String className = BASE_PACKAGE + "." + daoProvider.toLowerCase() + "." + daoProvider + "PersonDAO";
+		Class<? extends PersonDAO> castingClass;
 		try {
-			casting_class = (Class<? extends PersonDAO>) Class.forName(class_name);
-			DAO.person_provider = (PersonDAO) casting_class.newInstance();
-			return DAO.person_provider;
-		} catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
+			castingClass = (Class<? extends PersonDAO>) Class.forName(className);
+			Constructor<? extends PersonDAO> constructor = castingClass.getConstructor();
+			DAO.personDAO = constructor.newInstance();
+			return DAO.personDAO;
+		} catch (InvocationTargetException | NoSuchMethodException | SecurityException | InstantiationException
+				| IllegalAccessException | ClassNotFoundException e) {
 			throw new HException(e.getMessage(), e);
 		}
 	}
 
 	@SuppressWarnings("unchecked")
-	private static KeypairDAO set_keypair_dao() throws HException {
-		String class_name = BASE_PACKAGE + "." + dao_provider.toLowerCase() + "." + dao_provider + "KeypairDAO";
-		Class<? extends KeypairDAO> casting_class;
+	private static KeypairDAO setKeypairDAO() throws HException {
+		String className = BASE_PACKAGE + "." + daoProvider.toLowerCase() + "." + daoProvider + "KeypairDAO";
+		Class<? extends KeypairDAO> castingClass;
 		try {
-			casting_class = (Class<? extends KeypairDAO>) Class.forName(class_name);
-			DAO.keypair_provider = (KeypairDAO) casting_class.newInstance();
-			return DAO.keypair_provider;
-		} catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
+			castingClass = (Class<? extends KeypairDAO>) Class.forName(className);
+			Constructor<? extends KeypairDAO> constructor = castingClass.getConstructor();
+			DAO.keypairDAO = constructor.newInstance();
+			return DAO.keypairDAO;
+		} catch (InvocationTargetException | NoSuchMethodException | SecurityException | InstantiationException
+				| IllegalAccessException | ClassNotFoundException e) {
 			throw new HException(e.getMessage(), e);
 		}
 	}

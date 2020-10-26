@@ -13,7 +13,7 @@ public class TestingKeypairDAO implements KeypairDAO
 	private static List<Keypair> secure_storage = new LinkedList<Keypair>();
 
 	@Override
-	public Keypair get_by_id(String id)
+	public Keypair getById(String id)
 	{
 		for (Keypair s : secure_storage)
 		{
@@ -23,13 +23,13 @@ public class TestingKeypairDAO implements KeypairDAO
 	}
 
 	@Override
-	public List<Keypair> get_list()
+	public List<Keypair> getList()
 	{
 		return secure_storage;
 	}
 
 	@Override
-	public List<Keypair> get_owned_by_person_id(String owner_id)
+	public List<Keypair> getOwnedByPersonId(String owner_id)
 	{
 		List<Keypair> result = new LinkedList<Keypair>();
 
@@ -48,9 +48,9 @@ public class TestingKeypairDAO implements KeypairDAO
 	}
 
 	@Override
-	public List<Keypair> get_owned_by(Person owner) throws HException
+	public List<Keypair> getOwnedBy(Person owner) throws HException
 	{
-		if (owner != null) { return this.get_owned_by_person_id(owner.get_identifier()); }
+		if (owner != null) { return this.getOwnedByPersonId(owner.getIdentifier()); }
 		return new LinkedList<Keypair>();
 	}
 
@@ -59,7 +59,7 @@ public class TestingKeypairDAO implements KeypairDAO
 	{
 		if (new_keypair == null) throw new HException("Cannot insert a null yey pair");
 
-		if (this.get_by_id(new_keypair.getIdentifier()) == null)
+		if (this.getById(new_keypair.getIdentifier()) == null)
 		{
 			secure_storage.add(new_keypair);
 		}
@@ -97,7 +97,7 @@ public class TestingKeypairDAO implements KeypairDAO
 	@Override
 	public boolean delete(String keypair_id)
 	{
-		Keypair keypair = this.get_by_id(keypair_id);
+		Keypair keypair = this.getById(keypair_id);
 		return secure_storage.remove(keypair);
 	}
 

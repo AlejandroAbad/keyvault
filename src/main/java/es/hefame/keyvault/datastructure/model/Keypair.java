@@ -135,14 +135,14 @@ public class Keypair implements JsonEncodable {
 				logger.catching(e);
 			}
 
-			JSONArray json_cert_chain = new JSONArray();
-			for (X509Certificate chained_cert : this.certChain) {
-				JSONObject json_chained_cert = new JSONObject();
-				json_chained_cert.put("issuer", chained_cert.getIssuerDN().getName());
-				json_chained_cert.put("subject", chained_cert.getSubjectDN().getName());
-				json_cert_chain.add(json_chained_cert);
+			JSONArray jsonCertChain = new JSONArray();
+			for (X509Certificate chainedCert : this.certChain) {
+				JSONObject jsonChainedCert = new JSONObject();
+				jsonChainedCert.put("issuer", chainedCert.getIssuerDN().getName());
+				jsonChainedCert.put("subject", chainedCert.getSubjectDN().getName());
+				jsonCertChain.add(jsonChainedCert);
 			}
-			root.put("chain", json_cert_chain);
+			root.put("chain", jsonCertChain);
 		}
 
 		return root;

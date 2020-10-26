@@ -35,7 +35,7 @@ public class PAdES
 		Security.addProvider(new BouncyCastleProvider());
 	}
 
-	public static byte[] sign(byte[] payload, Keypair keypair, HashAlgorithm hash_algorithm, SignatureFormat signature_format) throws HttpException
+	public static byte[] sign(byte[] payload, Keypair keypair, HashAlgorithm hashAlgorithm, SignatureFormat signatureFormat) throws HttpException
 	{
 		try
 		{
@@ -56,10 +56,10 @@ public class PAdES
 
 			TSAClient tsaClient = new TSAClientBouncyCastle("https://freetsa.org/tsr");
 
-			ExternalSignature es = new PrivateKeySignature((PrivateKey) keypair.getPrivateKey(), hash_algorithm.itextpdfName, "BC");
+			ExternalSignature es = new PrivateKeySignature((PrivateKey) keypair.getPrivateKey(), hashAlgorithm.itextpdfName, "BC");
 			ExternalDigest digest = new BouncyCastleDigest();
 
-			MakeSignature.signDetached(appearance, digest, es, keypair.getCertificateChainArray(), null, null, tsaClient, 0, signature_format.itextpdf_cryptostandard);
+			MakeSignature.signDetached(appearance, digest, es, keypair.getCertificateChainArray(), null, null, tsaClient, 0, signatureFormat.itextpdf_cryptostandard);
 
 			return os.toByteArray();
 

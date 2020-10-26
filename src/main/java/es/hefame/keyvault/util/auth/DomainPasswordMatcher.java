@@ -25,7 +25,7 @@ public class DomainPasswordMatcher implements BasicPasswordMatcher {
 		}
 
 		try {
-			Domain domain = DAO.domain().get_by_id(domainName);
+			Domain domain = DAO.domain().getById(domainName);
 			log.debug("El dominio del usuario es [{}]", domain);
 			if (domain == null) {
 				log.info("No se encuentra el dominio [{}]", domainName);
