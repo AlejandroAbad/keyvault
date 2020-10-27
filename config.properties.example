@@ -18,7 +18,5 @@ dao.provider.MariaDb.user=userName
 dao.provider.MariaDb.pass=userPass
 
 # Configuración del proveedor MongoDb (Aun no implementado)
-#dao.provider.MongoDb.uri=
-#dao.provider.MongoDb.user=
-#dao.provider.MongoDb.pass=
-#dao.provider.MongoDb.database=
+dao.provider.MongoDb.uri=mongodb://user:pass@server.example.com/dbName
+dao.provider.MongoDb.db=dbName
