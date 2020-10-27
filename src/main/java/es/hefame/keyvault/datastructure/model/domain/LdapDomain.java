@@ -124,11 +124,10 @@ public class LdapDomain extends Domain {
 			ctls.setSearchScope(SearchControls.SUBTREE_SCOPE);
 			String parsedFilter = this.search_filter.replace("{%u}", personName);
 
-			L.debug("Autenticando al usuario [{}] contra el LDAP [{}] en la rama [{}] con filtro [{}]", personName,
-					this.ldap_uri, this.search_branch, parsedFilter);
+			L.debug("Autenticando al usuario [{}] contra el LDAP [{}] en la rama [{}] con filtro [{}]", personName,	this.ldap_uri, this.search_branch, parsedFilter);
 			NamingEnumeration<?> answer = ctx.search(this.search_branch, parsedFilter, ctls);
 
-			while (answer.hasMore()) {
+			if (answer.hasMore()) {
 				SearchResult rslt = (SearchResult) answer.next();
 				Attributes attrs = rslt.getAttributes();
 
@@ -142,16 +141,17 @@ public class LdapDomain extends Domain {
 				List<String> userGroups = new LinkedList<>();
 				NamingEnumeration<?> groups = attrs.get("memberOf").getAll();
 				while (groups.hasMore()) {
-
 					String s = groups.next().toString();
 					userGroups.add(s);
 				}
 
 				L.debug("Estableciendo grupos del usuario: {}", userGroups);
 				t.setInternalValue(USER_GROUPS, userGroups);
+				return true;
+			} else {
+				return false;
 			}
 
-			return true;
 
 		} catch (NamingException e) {
 			L.error("Fallo al autenticar al usuario contra el servidor LDAP");
